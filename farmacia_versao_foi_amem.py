@@ -19,7 +19,7 @@ class Cliente:
         self.nome = nome
         self.data_nascimento = data_nascimento
         self.desconto_idoso = verificar_idoso(datetime.strptime(data_nascimento, '%d/%m/%Y'))
-        Cliente.lista_cliente.append(self)
+        Cliente.lista_cliente.append((self.cpf,self.nome,self.data_nascimento))
 
     def __repr__(self) -> str:
         representacao = f"CPF: {self.cpf}, Nome: {self.nome}, Data de Nascimento: {self.data_nascimento}"
@@ -75,7 +75,7 @@ class Medicamento:
         self.preco = preco
         self.id_med = Medicamento.id_med
         Medicamento.id_med += 1
-        Medicamento.lista_de_medicamentos.append(self)
+        Medicamento.lista_de_medicamentos.append((self.id_med,self.nome,self.preco))
 
     def __repr__(self):
         representacao = f"ID: {self.id_med} - Nome: {self.nome} - Preço: {self.preco}"
@@ -173,38 +173,35 @@ def cadastrar_laboratorio():
     return laboratorio
 
 def efetuar_venda():
-    comprador = Cliente.buscar_cpf(input("CPF do cliente: "))
-    preco_final = 0
-    if comprador is None:
-        print("Cliente não encontrado.")
-        return
-
-    vendendo = True
-    while vendendo:
-        print("\nListagem de Medicamentos:")
-        for medicamento in Medicamento.lista_de_medicamentos:
-            print(medicamento)
-        medicamento_vendido = Medicamento.buscar_medicamento(int(input("Digite o ID do medicamento(Digite '0' para encerrar as vendas): ")))
-        if medicamento_vendido == 0:
-            vendendo = False
-        elif medicamento_vendido != None:
-            Venda(datetime.today(),medicamento_vendido , comprador)
-            preco_final += medicamento_vendido.preco
-        else:
-            print("Produto não encontrado.")
-
-
-    print("Venda efetuada com sucesso.")
-
-    if comprador.desconto_idoso == True:
-        preco_final = preco_final * 0.8
-        print(f'Com desconto, o valor da venda foi para {preco_final:.2f}!')
-    elif preco_final > 150:
-        preco_final = preco_final * 0.9
-        print(f'Com desconto, o valor da venda foi para {preco_final:.2f}!')
+    cpfs = [i for i, *n in Cliente.lista_cliente]
+    cpf_cliente = input('Entre com o CPF do cliente\n')
+    compra = []
+    fmt = "{:15}|{:^15}|R$ {:<10.2f}"
+    if cpf_cliente not in cpfs: # verificar com cpf dos clientes cadastrados
+        print('Cliente não cadastrado')
     else:
-        print(f"O valor da venda {preco_final:.2f}")
-
+        while True:
+            produto = input('Entre com o produto ou digite 0 para sair.\n')# verificar com a lista medicamentos
+            
+            if produto == "0":
+                break
+            else:
+                for id, nome, valor in Medicamento.lista_de_medicamentos:
+                    
+                    if nome == produto:
+                        quantidade = input('entre com a quantidade - ')
+                        compra.append((produto,int(quantidade),int(quantidade)*valor))
+                
+    print('Cliente: {:<45}'.format(cpf_cliente))
+    print('-------------------------------------------')
+    print('{:15}|{:^15}|R$ {:<10}'.format('Produtos','Quantidade','Valor'))
+    print('-------------------------------------------')      
+    for i,j, k in compra:
+        print(fmt.format(i,j,k))
+    total = sum([float(i) for j,k,i in compra])
+    print('-------------------------------------------') 
+    print('{:<31}|R$ {:<}'.format('TOTAL',total))
+    return compra
 
 def emitir_relatorios():
     # Listagem de clientes em ordem alfabética
@@ -283,4 +280,4 @@ while True:
         break
     else:
         print("Opção inválida.")
-        
+
