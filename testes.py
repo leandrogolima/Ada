@@ -4,8 +4,8 @@
 
 lista_clientes = ['Ana','Bruno','Carol','Douglas','Elaine','Fabio']
 
-def carrinho(cliente:object,lista_medicamentos:list)-> list:
-    
+def carrinho(cliente:object)-> list:
+
     compra = []
     fmt = "{:15}|{:^15}|R$ {:<10.2f}"
     if cliente not in lista_clientes: # verificar com cpf dos clientes cadastrados
@@ -28,6 +28,7 @@ def carrinho(cliente:object,lista_medicamentos:list)-> list:
     for i,j, k in compra:
         print(fmt.format(i,j,k))
     total = sum([float(i) for j,k,i in compra])
+    print('-------------------------------------------') 
     print('{:<31}|R$ {:<}'.format('TOTAL',total))
     return compra
 
@@ -37,8 +38,3 @@ def carrinho(cliente:object,lista_medicamentos:list)-> list:
 carrinho('Ana')
 
 
-
-
-
-            
-    
